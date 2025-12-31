@@ -89,6 +89,7 @@ graph TB
 Support with three backends for maximum compatibility:
 PyPDF2, PyMuPDF (fitz), pdfplumber](url)
 
+---
 ## Installation
 
 ### Requirements
@@ -338,37 +339,6 @@ if __name__ == '__main__':
 
 ---
 
-## Models Used
-
-### Embeddings
-
-- **Model**: `nomic-ai/nomic-embed-text-v2-moe`
-- **Vector size**: 768
-- **Metric**: COSINE
-- **Dual-prompt**: `passage` for documents, `query` for queries
-
-### Reranking
-
-- **Model**: `BAAI/bge-reranker-v2-m3`
-- **Type**: Cross-encoder
-- **Max sequence length**: 512
-
-## Architecture Features
-
-### Singleton Pattern for AI Models
-[`LocalEmbedder`](quad_rag_core/embedder.py:6) and [`LocalReranker`](quad_rag_core/reranker.py:6) use the Singleton for efficient GPU memory usage.
-
-### State Persistence
-Watcher configuration is saved in Qdrant as metadata with a fixed UUID for automatic state restoration after service restart.
-
-### Multi-Backend PDF Extraction
-Three backends for PDF text extraction with automatic fallback: PyPDF2 → PyMuPDF → pdfplumber.
-
-### Thread Safety
-Thread locks are used for safe concurrent access to watchers and progress tracking.
-
----
-
 ## Usage Examples
 
 ### Searching Codebase
@@ -415,6 +385,35 @@ query = "how to configure database connection?"
 # ... same search pipeline
 ```
 
+## Models Used
+
+### Embeddings
+
+- **Model**: `nomic-ai/nomic-embed-text-v2-moe`
+- **Vector size**: 768
+- **Metric**: COSINE
+- **Dual-prompt**: `passage` for documents, `query` for queries
+
+### Reranking
+
+- **Model**: `BAAI/bge-reranker-v2-m3`
+- **Type**: Cross-encoder
+- **Max sequence length**: 512
+
+## Architecture Features
+
+### Singleton Pattern for AI Models
+[`LocalEmbedder`](quad_rag_core/embedder.py:6) and [`LocalReranker`](quad_rag_core/reranker.py:6) use the Singleton for efficient GPU memory usage.
+
+### State Persistence
+Watcher configuration is saved in Qdrant as metadata with a fixed UUID for automatic state restoration after service restart.
+
+### Multi-Backend PDF Extraction
+Three backends for PDF text extraction with automatic fallback: PyPDF2 → PyMuPDF → pdfplumber.
+
+### Thread Safety
+Thread locks are used for safe concurrent access to watchers and progress tracking.
+
 ---
 
 ## Troubleshooting
@@ -442,13 +441,9 @@ docker run -p 6333:6333 qdrant/qdrant
 - Metrics and monitoring
 - Additional embedding and reranking models
 
----
-
 ## License
 
 MIT License
-
----
 
 ## Acknowledgments
 
@@ -458,8 +453,8 @@ MIT License
 - [Nomic AI](https://nomic.ai/) — nomic-embed-text-v2-moe model
 - [BAAI](https://github.com/FlagOpen/FlagEmbedding) — BGE-reranker-v2-m3 model
 
----
-
+## Author
+[Alexander Kazantsev](https://linkedin.com/in/kazantsev/), 2025
 <div align="center">
 
 **Made for open-source community** 🚀
