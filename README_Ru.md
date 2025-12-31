@@ -453,7 +453,7 @@ MIT License
 - [BAAI](https://github.com/FlagOpen/FlagEmbedding) — Модель BGE-reranker-v2-m3
 
 ## Автор
-[Alexander Kazantsev](https://habr.com/ru/users/akazant/articles/), 2025 
+[Александр Казанцев](https://habr.com/ru/users/akazant/articles/), 2025 
 <div align="center">
 
 **Создано для open-source сообщества** 🚀
