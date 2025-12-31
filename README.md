@@ -2,7 +2,7 @@
 
 <div align="center">
 
-**Autonomous Semantic RAG-based Search for Local Files**
+**Semantic Qdrant-based RAG Search for Local Files**
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
