@@ -1,0 +1,20 @@
+# Quad-RAG-Core Dependencies
+
+# Vector Database
+qdrant-client>=1.10.0
+
+# AI/ML Models
+sentence-transformers>=3.0.0
+torch>=2.0.0
+
+# File System Monitoring
+watchdog>=4.0.0
+
+# PDF Extraction (multiple backends with fallback)
+pypdf>=5.0.0
+PyMuPDF>=1.23.0
+pdfplumber>=0.10.0
+
+# MIME Type Detection
+python-magic; platform_system!='Windows'
+python-magic-bin; platform_system=='Windows'

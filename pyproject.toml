@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=60.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "quad-rag-core"
+version = "0.1.0"
+description = "Core RAG logic for Qdrant-based semantic search"
+requires-python = ">=3.10"
+dependencies = [
+    "qdrant-client>=1.10.0",
+    "sentence-transformers>=3.0.0",
+    "torch>=2.0.0",
+    "watchdog>=4.0.0",
+    "pypdf>=5.0.0",
+    "PyMuPDF>=1.23.0",
+    "pdfplumber>=0.10.0",
+    "python-magic; platform_system!='Windows'",
+    "python-magic-bin; platform_system=='Windows'"
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["quad_rag_core*"]  
+namespaces = false
