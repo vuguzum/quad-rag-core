@@ -9,7 +9,7 @@
 ![Qdrant](https://img.shields.io/badge/Qdrant-1.10%2B-orange)
 ![CUDA](https://img.shields.io/badge/CUDA-Supported-purple)
 
-English | [Русский](README-Ru.md)
+English | [Русский](README_Ru.md)
 
 </div>
 
