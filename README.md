@@ -130,7 +130,7 @@ path_manager.watch_folder("/path/to/your/codebase", content_types=["text", "pdf"
 
 # Search
 query_vector = embedder.embed_query("how does authentication work?")
-results = qdrant_manager.search("rag_your_codebase", query_vector, limit=10)
+results = qdrant_manager.search("how does authentication work?", query_vector, limit=10)
 
 # Reranking for improved accuracy
 reranker = LocalReranker()
@@ -193,7 +193,7 @@ from quad_rag_core.embedder import LocalEmbedder
 from quad_rag_core.reranker import LocalReranker
 from fastmcp import FastMCP
 
-mcp = FastMCP("rag-mcp-service")
+mcp = FastMCP("rag-mcp-server")
 
 # Create manager
 pm = PathWatcherManager(
