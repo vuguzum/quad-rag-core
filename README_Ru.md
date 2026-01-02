@@ -111,9 +111,7 @@ docker run -p 6333:6333 qdrant/qdrant
 
 ---
 
-## Быстрый старт
-
-### Базовое использование
+## Обзор интерфейса
 
 ```python
 from quad_rag_core.path_manager import PathWatcherManager
@@ -145,7 +143,7 @@ for chunk, score in reranked:
     print("-" * 50)
 ```
 
-### Получение статуса watcher'а
+### Получение статуса watcher'а папки
 
 ```python
 # Получить статус всех отслеживаемых папок
@@ -185,53 +183,55 @@ RERANK_SCORE_THRESHOLD = 0.35
 
 ## Интеграция
 
-### MCP Server
+### MCP Server (упрощенный пример)
 
 ```python
 from quad_rag_core.path_manager import PathWatcherManager
 from quad_rag_core.qdrant_manager import QdrantManager
 from quad_rag_core.embedder import LocalEmbedder
 from quad_rag_core.reranker import LocalReranker
+from fastmcp import FastMCP
 
-# Создать менеджер
+mcp = FastMCP("rag-mcp-server")
+
+# Create manager
 pm = PathWatcherManager(
     QdrantManager(host="localhost", port=6333),
     LocalEmbedder()
 )
 
-# MCP инструменты
+# MCP tools
 @mcp.tool()
 def watch_folder(path: str, content_types: list = ["text"]):
-    """Начать отслеживание папки"""
+    """Start watching a folder"""
     pm.watch_folder(path, content_types)
 
 @mcp.tool()
 def search(query: str, collection: str, limit: int = 10):
-    """Выполнить семантический поиск"""
+    """Perform semantic search (simplified)"""
     embedder = LocalEmbedder()
     qdrant = QdrantManager()
     reranker = LocalReranker()
     
-    # Векторный поиск
+    # Vector search
     vector = embedder.embed_query(query)
-    results = qdrant.search(collection, vector, limit=limit)
+    hits = qdrant.search(collection, vector, limit=limit)
     
-    # Реранжирование
-    chunks = [r.payload.get("content_preview", "") for r in results]
+    # Reranking
+    chunks = [r.payload.get("content_preview", "") for r in hits]
     reranked = reranker.rerank(query, chunks, top_k=limit)
     
-    return [
+    results=  [
         {"content": chunk, "score": float(score)}
         for chunk, score in reranked
     ]
-
-@mcp.tool()
-def get_status():
-    """Получить статус всех watcher'ов"""
-    return pm.get_watched_folders()
+    return {
+        "status": "success",
+        "results": results
+    }
 ```
 
-### FastAPI веб-интерфейс
+### FastAPI веб-интерфейс (упрощенный пример)
 
 ```python
 from fastapi import FastAPI
@@ -282,107 +282,7 @@ async def unwatch_folder(path: str):
     return {"status": "unwatched", "path": path}
 ```
 
-### CLI утилита
-
-```python
-import click
-from quad_rag_core.path_manager import PathWatcherManager
-from quad_rag_core.qdrant_manager import QdrantManager
-from quad_rag_core.embedder import LocalEmbedder
-from quad_rag_core.reranker import LocalReranker
-
-@click.group()
-def cli():
-    """CLI для Quad-RAG-Core"""
-    pass
-
-@cli.command()
-@click.argument('path')
-@click.option('--content-types', default='text', help='Типы контента: text, pdf')
-def watch(path, content_types):
-    """Начать отслеживание папки"""
-    pm = PathWatcherManager(QdrantManager(), LocalEmbedder())
-    pm.watch_folder(path, content_types.split(','))
-    click.echo(f"Watching folder: {path}")
-
-@cli.command()
-@click.argument('query')
-@click.argument('collection')
-@click.option('--limit', default=10, help='Количество результатов')
-def search(query, collection, limit):
-    """Выполнить поиск"""
-    embedder = LocalEmbedder()
-    qdrant = QdrantManager()
-    reranker = LocalReranker()
-    
-    vector = embedder.embed_query(query)
-    results = qdrant.search(collection, vector, limit=limit)
-    chunks = [r.payload.get("content_preview", "") for r in results]
-    reranked = reranker.rerank(query, chunks, top_k=limit)
-    
-    for chunk, score in reranked:
-        click.echo(f"[{score:.4f}] {chunk[:100]}...")
-
-@cli.command()
-def status():
-    """Показать статус"""
-    pm = PathWatcherManager(QdrantManager(), LocalEmbedder())
-    folders = pm.get_watched_folders()
-    
-    for folder in folders:
-        click.echo(f"{folder['path']}: {folder['status']} ({folder['progress_percent']}%)")
-
-if __name__ == '__main__':
-    cli()
-```
-
 ---
-
-## Примеры использования
-
-### Поиск по кодовой базе
-
-```python
-from quad_rag_core.path_manager import PathWatcherManager
-from quad_rag_core.qdrant_manager import QdrantManager
-from quad_rag_core.embedder import LocalEmbedder
-from quad_rag_core.reranker import LocalReranker
-
-# Инициализация
-pm = PathWatcherManager(QdrantManager(), LocalEmbedder())
-
-# Отследить папку проекта
-pm.watch_folder("/home/user/myproject", content_types=["text"])
-
-# Поиск функции аутентификации
-embedder = LocalEmbedder()
-qdrant = QdrantManager()
-reranker = LocalReranker()
-
-query = "where is the login function?"
-vector = embedder.embed_query(query)
-results = qdrant.search("rag_home_user_myproject", vector, limit=20)
-
-chunks = [r.payload.get("content_preview", "") for r in results]
-reranked = reranker.rerank(query, chunks, top_k=5)
-
-# Вывод результатов
-for chunk, score in reranked:
-    print(f"Score: {score:.4f}")
-    print(f"Content: {chunk}")
-    print("-" * 50)
-```
-
-### Поиск по документации
-
-```python
-# Отследить папку документации
-pm.watch_folder("/docs", content_types=["text", "pdf"])
-
-# Поиск информации о конфигурации
-query = "how to configure database connection?"
-# ... тот же конвейер поиска
-```
 
 ## Используемые модели
 
