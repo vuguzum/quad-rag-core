@@ -129,7 +129,7 @@ path_manager.watch_folder("/path/to/your/codebase", content_types=["text", "pdf"
 
 # Поиск
 query_vector = embedder.embed_query("how does authentication work?")
-results = qdrant_manager.search("rag_your_codebase", query_vector, limit=10)
+results = qdrant_manager.search("how does authentication work?", query_vector, limit=10)
 
 # Реранжирование для улучшения точности
 reranker = LocalReranker()
