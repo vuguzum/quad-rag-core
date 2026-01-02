@@ -112,9 +112,7 @@ docker run -p 6333:6333 qdrant/qdrant
 
 ---
 
-## Quick Start
-
-### Basic Usage
+## Inferface overview 
 
 ```python
 from quad_rag_core.path_manager import PathWatcherManager
@@ -146,7 +144,7 @@ for chunk, score in reranked:
     print("-" * 50)
 ```
 
-### Getting Watcher Status
+### Folder Watcher Status
 
 ```python
 # Get status of all watched folders
@@ -186,13 +184,16 @@ RERANK_SCORE_THRESHOLD = 0.35
 
 ## Integration
 
-### MCP Server
+### MCP Server (simplified)
 
 ```python
 from quad_rag_core.path_manager import PathWatcherManager
 from quad_rag_core.qdrant_manager import QdrantManager
 from quad_rag_core.embedder import LocalEmbedder
 from quad_rag_core.reranker import LocalReranker
+from fastmcp import FastMCP
+
+mcp = FastMCP("rag-mcp-service")
 
 # Create manager
 pm = PathWatcherManager(
@@ -208,31 +209,30 @@ def watch_folder(path: str, content_types: list = ["text"]):
 
 @mcp.tool()
 def search(query: str, collection: str, limit: int = 10):
-    """Perform semantic search"""
+    """Perform semantic search (simplified)"""
     embedder = LocalEmbedder()
     qdrant = QdrantManager()
     reranker = LocalReranker()
     
     # Vector search
     vector = embedder.embed_query(query)
-    results = qdrant.search(collection, vector, limit=limit)
+    hits = qdrant.search(collection, vector, limit=limit)
     
     # Reranking
-    chunks = [r.payload.get("content_preview", "") for r in results]
+    chunks = [r.payload.get("content_preview", "") for r in hits]
     reranked = reranker.rerank(query, chunks, top_k=limit)
     
-    return [
+    results=  [
         {"content": chunk, "score": float(score)}
         for chunk, score in reranked
     ]
-
-@mcp.tool()
-def get_status():
-    """Get status of all watchers"""
-    return pm.get_watched_folders()
+    return {
+        "status": "success",
+        "results": results
+    }
 ```
 
-### FastAPI Web Interface
+### FastAPI Web Interface (simplified)
 
 ```python
 from fastapi import FastAPI
@@ -283,107 +283,7 @@ async def unwatch_folder(path: str):
     return {"status": "unwatched", "path": path}
 ```
 
-### CLI Utility
-
-```python
-import click
-from quad_rag_core.path_manager import PathWatcherManager
-from quad_rag_core.qdrant_manager import QdrantManager
-from quad_rag_core.embedder import LocalEmbedder
-from quad_rag_core.reranker import LocalReranker
-
-@click.group()
-def cli():
-    """CLI for Quad-RAG-Core"""
-    pass
-
-@cli.command()
-@click.argument('path')
-@click.option('--content-types', default='text', help='Content types: text, pdf')
-def watch(path, content_types):
-    """Start watching a folder"""
-    pm = PathWatcherManager(QdrantManager(), LocalEmbedder())
-    pm.watch_folder(path, content_types.split(','))
-    click.echo(f"Watching folder: {path}")
-
-@cli.command()
-@click.argument('query')
-@click.argument('collection')
-@click.option('--limit', default=10, help='Number of results')
-def search(query, collection, limit):
-    """Perform search"""
-    embedder = LocalEmbedder()
-    qdrant = QdrantManager()
-    reranker = LocalReranker()
-    
-    vector = embedder.embed_query(query)
-    results = qdrant.search(collection, vector, limit=limit)
-    chunks = [r.payload.get("content_preview", "") for r in results]
-    reranked = reranker.rerank(query, chunks, top_k=limit)
-    
-    for chunk, score in reranked:
-        click.echo(f"[{score:.4f}] {chunk[:100]}...")
-
-@cli.command()
-def status():
-    """Show status"""
-    pm = PathWatcherManager(QdrantManager(), LocalEmbedder())
-    folders = pm.get_watched_folders()
-    
-    for folder in folders:
-        click.echo(f"{folder['path']}: {folder['status']} ({folder['progress_percent']}%)")
-
-if __name__ == '__main__':
-    cli()
-```
-
 ---
-
-## Usage Examples
-
-### Searching Codebase
-
-```python
-from quad_rag_core.path_manager import PathWatcherManager
-from quad_rag_core.qdrant_manager import QdrantManager
-from quad_rag_core.embedder import LocalEmbedder
-from quad_rag_core.reranker import LocalReranker
-
-# Initialize
-pm = PathWatcherManager(QdrantManager(), LocalEmbedder())
-
-# Watch project folder
-pm.watch_folder("/home/user/myproject", content_types=["text"])
-
-# Search for authentication function
-embedder = LocalEmbedder()
-qdrant = QdrantManager()
-reranker = LocalReranker()
-
-query = "where is the login function?"
-vector = embedder.embed_query(query)
-results = qdrant.search("rag_home_user_myproject", vector, limit=20)
-
-chunks = [r.payload.get("content_preview", "") for r in results]
-reranked = reranker.rerank(query, chunks, top_k=5)
-
-# Output results
-for chunk, score in reranked:
-    print(f"Score: {score:.4f}")
-    print(f"Content: {chunk}")
-    print("-" * 50)
-```
-
-### Searching Documentation
-
-```python
-# Watch documentation folder
-pm.watch_folder("/docs", content_types=["text", "pdf"])
-
-# Search for configuration information
-query = "how to configure database connection?"
-# ... same search pipeline
-```
 
 ## Models Used
 
