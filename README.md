@@ -17,9 +17,7 @@ English | [Русский](README_Ru.md)
 
 ## Description
 
-**Quad-RAG-Core** is a Python middleware module library for semantic search systems on local folders with Qdrant vector database
-
-and automatic file change tracking and index maintenance.
+**Quad-RAG-Core** is a Python middleware module library for semantic search systems on local folders with Qdrant vector database and automatic file change tracking and index maintenance.
 
 ### Key Features
 
