@@ -293,7 +293,7 @@ async def unwatch_folder(path: str):
 - **Метрика**: COSINE
 - **Двойной промпт**: `passage` для документов, `query` для запросов
 
-### Реранжирование
+### Реранкинг
 
 - **Модель**: `BAAI/bge-reranker-v2-m3`
 - **Тип**: Cross-encoder
