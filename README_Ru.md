@@ -44,7 +44,7 @@
 | [`QdrantManager`](quad_rag_core/qdrant_manager.py) | Обёртка над Qdrant Client |
 | [`LocalEmbedder`](quad_rag_core/embedder.py) | Синглтон для эмбеддингов (nomic-embed-text) |
 | [`LocalReranker`](quad_rag_core/reranker.py) | Синглтон для ранжирования (BGE-reranker) |
-| [`FileProcessor`](quad_rag_core/file_processor.py) | Извлечение текста из файлов и чанкование |
+| [`FileProcessor`](quad_rag_core/file_processor.py) | Извлечение текста из файлов и чанкинг |
 | [`config.py`](quad_rag_core/config.py) | Системная конфигурация |
 | [`utils.py`](quad_rag_core/utils.py) | Утилиты: хеширование, MIME-типы, нормализация путей |
 
